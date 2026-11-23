@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Secure OTP-based authentication system with email verification." />
+  <title>Authentication</title>
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23292524'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='serif' fill='white'>A</text></svg>" />
+</head>
+<body>
+
+  <div id="view-signup" class="view auth-layout active">
+    <div class="auth-hero">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="auth-hero-content">
+        <h1>Start building<br />with confidence</h1>
+        <p>Create your account and secure every action with email-verified authentication.</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Create account</h2>
+          <p>Enter your details to get started.</p>
+        </div>
+
+        <div id="signup-alert" class="alert" role="alert">
+          <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4M8 10.5v1"/></svg>
+          <span id="signup-alert-text"></span>
+        </div>
+
+        <form id="signup-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="signup-name">Full name</label>
+            <input class="form-input" type="text" id="signup-name" name="name" placeholder="Your full name" autocomplete="name" required />
+            <div class="form-error" id="signup-name-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-email">Email address</label>
+            <input class="form-input" type="email" id="signup-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="form-error" id="signup-email-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="signup-password">Password</label>
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="signup-password" name="password" placeholder="Minimum 8 characters" autocomplete="new-password" required />
+              <button type="button" class="password-toggle" data-target="signup-password" aria-label="Toggle password visibility">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="form-error" id="signup-password-error"></div>
+            <div class="password-strength" id="signup-strength">
+              <div class="strength-bar-track">
+                <div class="strength-bar-fill" id="signup-strength-bar"></div>
+              </div>
+              <div class="strength-text" id="signup-strength-text"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="signup-submit">
+            <span class="btn-label">Create account</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p>Already have an account? <button type="button" onclick="showView('login')">Sign in</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-verify" class="view auth-layout">
+    <div class="auth-hero">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-4"></div>
+      <div class="auth-hero-content">
+        <h1>Check your<br />inbox</h1>
+        <p>We sent a 6-digit verification code to your email. Enter it below to continue.</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Verify your email</h2>
+          <p>Enter the 6-digit code sent to <strong id="verify-email-display"></strong></p>
+        </div>
+
+        <div id="verify-alert" class="alert" role="alert">
+          <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4M8 10.5v1"/></svg>
+          <span id="verify-alert-text"></span>
+        </div>
+
+        <form id="verify-form" novalidate>
+          <div class="otp-input-group" id="otp-group">
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="0" aria-label="Digit 1" autocomplete="one-time-code" />
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="1" aria-label="Digit 2" />
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="2" aria-label="Digit 3" />
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="3" aria-label="Digit 4" />
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="4" aria-label="Digit 5" />
+            <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="5" aria-label="Digit 6" />
+          </div>
+          <div class="form-error" id="verify-otp-error" style="text-align:center;"></div>
+
+          <button type="submit" class="btn btn-primary" id="verify-submit">
+            <span class="btn-label">Verify</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="resend-section">
+          <p>Didn't receive a code?</p>
+          <button type="button" class="resend-btn" id="resend-btn" disabled>
+            Resend code <span id="resend-timer"></span>
+          </button>
+        </div>
+
+        <div class="form-footer">
+          <p><button type="button" onclick="goBackFromVerify()">Use a different email</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-login" class="view auth-layout">
+    <div class="auth-hero">
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="orb orb-4"></div>
+      <div class="auth-hero-content">
+        <h1>Welcome<br />back</h1>
+        <p>Sign in to your account to continue where you left off.</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Sign in</h2>
+          <p>Enter your credentials to continue.</p>
+        </div>
+
+        <div id="login-alert" class="alert" role="alert">
+          <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4M8 10.5v1"/></svg>
+          <span id="login-alert-text"></span>
+        </div>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email address</label>
+            <input class="form-input" type="email" id="login-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="form-error" id="login-email-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required />
+              <button type="button" class="password-toggle" data-target="login-password" aria-label="Toggle password visibility">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="form-error" id="login-password-error"></div>
+          </div>
+
+          <div style="text-align: right; margin-bottom: var(--space-md);">
+            <button type="button" class="btn-text muted" onclick="showView('forgot')">Forgot password?</button>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="login-submit">
+            <span class="btn-label">Sign in</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p>Don't have an account? <button type="button" onclick="showView('signup')">Create one</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-forgot" class="view auth-layout">
+    <div class="auth-hero">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-3"></div>
+      <div class="auth-hero-content">
+        <h1>Reset your<br />password</h1>
+        <p>Enter your email address and we will send you a verification code to reset your password.</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Forgot password</h2>
+          <p>Enter the email address associated with your account.</p>
+        </div>
+
+        <div id="forgot-alert" class="alert" role="alert">
+          <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4M8 10.5v1"/></svg>
+          <span id="forgot-alert-text"></span>
+        </div>
+
+        <form id="forgot-form" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="forgot-email">Email address</label>
+            <input class="form-input" type="email" id="forgot-email" name="email" placeholder="you@example.com" autocomplete="email" required />
+            <div class="form-error" id="forgot-email-error"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="forgot-submit">
+            <span class="btn-label">Send reset code</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p><button type="button" onclick="showView('login')">Back to sign in</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-reset" class="view auth-layout">
+    <div class="auth-hero">
+      <div class="orb orb-2"></div>
+      <div class="orb orb-4"></div>
+      <div class="auth-hero-content">
+        <h1>Set a new<br />password</h1>
+        <p>Enter the verification code from your email and choose a new password.</p>
+      </div>
+    </div>
+    <div class="auth-form-section">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>Reset password</h2>
+          <p>Enter the code sent to <strong id="reset-email-display"></strong></p>
+        </div>
+
+        <div id="reset-alert" class="alert" role="alert">
+          <svg class="alert-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4M8 10.5v1"/></svg>
+          <span id="reset-alert-text"></span>
+        </div>
+
+        <form id="reset-form" novalidate>
+          <div class="form-group">
+            <label class="form-label">Verification code</label>
+            <div class="otp-input-group" id="reset-otp-group">
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="0" aria-label="Digit 1" />
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="1" aria-label="Digit 2" />
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="2" aria-label="Digit 3" />
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="3" aria-label="Digit 4" />
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="4" aria-label="Digit 5" />
+              <input class="otp-digit" type="text" inputmode="numeric" maxlength="1" data-index="5" aria-label="Digit 6" />
+            </div>
+            <div class="form-error" id="reset-otp-error" style="text-align:center;"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reset-password">New password</label>
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="reset-password" name="newPassword" placeholder="Minimum 8 characters" autocomplete="new-password" required />
+              <button type="button" class="password-toggle" data-target="reset-password" aria-label="Toggle password visibility">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="form-error" id="reset-password-error"></div>
+            <div class="password-strength" id="reset-strength">
+              <div class="strength-bar-track">
+                <div class="strength-bar-fill" id="reset-strength-bar"></div>
+              </div>
+              <div class="strength-text" id="reset-strength-text"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reset-confirm">Confirm new password</label>
+            <div class="password-wrapper">
+              <input class="form-input" type="password" id="reset-confirm" name="confirmPassword" placeholder="Re-enter your password" autocomplete="new-password" required />
+              <button type="button" class="password-toggle" data-target="reset-confirm" aria-label="Toggle password visibility">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="form-error" id="reset-confirm-error"></div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="reset-submit">
+            <span class="btn-label">Reset password</span>
+            <div class="spinner"></div>
+          </button>
+        </form>
+
+        <div class="resend-section">
+          <p>Didn't receive a code?</p>
+          <button type="button" class="resend-btn" id="reset-resend-btn" disabled>
+            Resend code <span id="reset-resend-timer"></span>
+          </button>
+        </div>
+
+        <div class="form-footer">
+          <p><button type="button" onclick="showView('login')">Back to sign in</button></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-dashboard" class="dashboard-view">
+    <div class="dashboard-layout">
+      <nav class="dashboard-nav">
+        <span class="dashboard-nav-brand">Authentication</span>
+        <button class="btn btn-outline" id="logout-btn" style="width:auto; height:36px; padding:8px 16px; font-size:14px;">
+          Sign out
+        </button>
+      </nav>
+      <div class="dashboard-content">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="dashboard-card">
+          <h1 id="dashboard-greeting">Welcome</h1>
+          <p>You are signed in and your email has been verified.</p>
+          <div class="dashboard-meta">
+            <div class="dashboard-meta-row">
+              <span class="dashboard-meta-label">Name</span>
+              <span class="dashboard-meta-value" id="dashboard-name">--</span>
+            </div>
+            <div class="dashboard-meta-row">
+              <span class="dashboard-meta-label">Email</span>
+              <span class="dashboard-meta-value" id="dashboard-email">--</span>
+            </div>
+            <div class="dashboard-meta-row">
+              <span class="dashboard-meta-label">Status</span>
+              <span class="verified-badge">Verified</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="dashboard-logout-btn">
+            <span class="btn-label">Sign out</span>
+            <div class="spinner"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
